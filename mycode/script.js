@@ -457,3 +457,113 @@ DATA CAR 1: 'Tesla' going at 120 km/h, with a charge of 23%
 
 GOOD LUCK!!!
 */
+/*
+const Car = function (make, speed) {
+  //Instance Properties
+  this.make = make;
+  this.speed = speed;
+};
+
+Car.prototype.accelerate = function () {
+  this.speed += 10;
+  console.log(`${this.make} is going at ${this.speed}km/h.`);
+};
+
+Car.prototype.brake = function () {
+  this.speed -= 5;
+  console.log(`${this.make} is going at ${this.speed}km/h.`);
+};
+
+const EV = function (make, speed, charge) {
+  Car.call(this, make, speed);
+  this.charge = charge;
+};
+
+//Link the prototypes
+//want the prototype property from EV to inherit from...
+//the prototype property of Car
+EV.prototype = Object.create(Car.prototype);
+
+//Add methods
+EV.prototype.chargeBattery = function (chargeTo) {
+  this.charge = chargeTo;
+};
+
+//implement an accelerate method
+EV.prototype.accelerate = function () {
+  this.speed += 20;
+  this.charge--; //decrease charge by 1%
+  console.log(
+    `${this.make} is going at ${this.speed}km/h, with a charge of ${this.charge}.`
+  );
+};
+
+const tesla = new EV('Tesla', 120, 23);
+tesla.chargeBattery(90);
+console.log(tesla);
+//EV {make: 'Tesla', speed: 120, charge: 90}
+//charge:90
+//make:"Tesla"
+//speed:120
+//[[Prototype]]:Car
+//accelerate:ƒ ()
+//chargeBattery:ƒ (chargeTo)
+//[[Prototype]]:Object
+//accelerate:ƒ ()
+//brake:ƒ ()
+//constructor:ƒ (make, speed)
+//[[Prototype]]:Object
+tesla.brake();
+tesla.accelerate(); //EV accelerate called(first one in chain) POLYMORPHISM
+//child class can overwrite a method that it inherited from the parent class
+*/
+
+//////////////////////////////////////////////////////////////////////////
+//INHERITANCE BETWEEN 'CLASSES': ES6 CLASSES
+//need 2 things: the extend keyword and the super function
+
+class PersonCl {
+  constructor(fullName, birthYear) {
+    this.fullName = fullName;
+    this.birthYear = birthYear;
+  }
+
+  //method
+  calcAge() {
+    console.log(2037 - this.birthYear);
+  }
+
+  greet() {
+    console.log(`Hey ${this.fullName}!`);
+  }
+
+  //getter
+  get age() {
+    return 2037 - this.birthYear;
+  }
+
+  //when you have a setter that is trying to SET A PROPERTY THAT ALREADY EXISTS:
+  //add underscore _fullName (creates a new variable)
+  set fullName(name) {
+    if (name.includes(' ')) this._fullName = name;
+    else alert(`${name} is not a full name!`);
+  }
+  //now set a getter
+  get fullName() {
+    return this._fullName;
+  }
+
+  //Static Method
+  static hey() {
+    console.log('Hey there!');
+    //console.log(this); //constructor function
+  }
+}
+
+class StudentCl extends PersonCl {
+  constructor(fullName, birthYear, course) {
+    //always needs to happen first (creates 'this' keyword in subclass)
+    super(fullName, birthYear); //pass in arguments from Parents Constructor
+    this.course = course;
+  }
+}
