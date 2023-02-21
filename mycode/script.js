@@ -627,7 +627,7 @@ const jay = Object.create(StudentProto);
 jay.init('Jay', 2010, 'Computer Science');
 jay.introduce();
 jay.calcAge();
-*/
+
 
 //////////////////////////////////////////////////////////////////////////
 //ANOTHER CLASS EXAMPLE
@@ -659,7 +659,7 @@ class Account {
   requestLoan(val) {
     if (this.approveLoan(val)) {
       this.deposit(val);
-      console.log(`Loan ${val} approved.`);
+      console.log(`Loan for ${val} approved.`);
     }
   }
 }
@@ -679,4 +679,304 @@ console.log(acc1);
 
 //pin accessable outside account (security issue)
 console.log(acc1.pin);
-//need data encapsilation and data privacy
+//need data encapsulation and data privacy
+
+
+//////////////////////////////////////////////////////////////////////////
+//ENCAPSULATION: PROTECTED PROPERTIES AND METHODS
+//prevent code outside a class from accidentally manimulating our data inside the class
+//expose only a small public interface = can do internal changes without causeing bugs
+
+class Account {
+  constructor(owner, currency, pin) {
+    this.owner = owner;
+    this.currency = currency;
+    // protected property (convention not actual protection/privacy)
+    this._pin = pin;
+    this._movements = [];
+    this.locale = navigator.language;
+
+    console.log(`Thanks for opening an account, ${owner}!`);
+  }
+
+  // Public interface
+  getMovements() {
+    return this._movements;
+  }
+
+  deposit(val) {
+    this._movements.push(val);
+  }
+
+  withdraw(val) {
+    this.deposit(-val);
+  }
+
+  //protected method(should not be part of public interface)
+  _approveLoan(val) {
+    return true;
+  }
+
+  requestLoan(val) {
+    if (this._approveLoan(val)) {
+      this.deposit(val);
+      console.log(`Loan for ${val} approved.`);
+    }
+  }
+}
+
+const acc1 = new Account('Jonas', 'EUR', 1111);
+console.log(acc1);
+
+//acc1._movements.push(250);
+//still accessable but convention that everyone on team knows this _ means:
+//it's protected/should not be directly changed/interacted with
+console.log(acc1.getMovements()); //access through this method
+acc1.deposit(250);
+acc1.withdraw(140);
+acc1.requestLoan(1000);
+//acc1._approveLoan(1000); //still accessable, but convention recognized
+console.log(acc1);
+
+
+//////////////////////////////////////////////////////////////////////////
+//ENCAPSULATION: PRIVATE CLASS FIELDS(properties) AND METHODS
+
+//1)Public fields
+//2)Private fields
+//3)Public methods
+//4)Private methods
+//(there is also the static version of each)
+
+class Account {
+  //1)Public fields(present on all instances created through the class)
+  //not on the prototype
+  //also referencable via the 'this' keyword
+  locale = navigator.language;
+
+  //2)Private fields(present on all instances created through the class)
+  //truly not accessable from the outside
+  //hashtag makes it private
+  #movements = [];
+  #pin; //create empty/undefined first to access in constructor
+
+  constructor(owner, currency, pin) {
+    this.owner = owner;
+    this.currency = currency;
+    this.#pin = pin;
+    //this._movements = [];
+    //this.locale = navigator.language;
+
+    console.log(`Thanks for opening an account, ${owner}!`);
+  }
+
+  //3)Public methods
+  // Public interface
+  getMovements() {
+    return this.#movements;
+  }
+
+  deposit(val) {
+    this.#movements.push(val);
+  }
+
+  withdraw(val) {
+    this.deposit(-val);
+  }
+
+  //Protected method
+  _approveLoan(val) {
+    return true;
+  }
+
+  requestLoan(val) {
+    if (this._approveLoan(val)) {
+      this.deposit(val);
+      console.log(`Loan for ${val} approved.`);
+    }
+  }
+
+  //quick example of static:
+  //only available on the class itself not on instances
+  static helper() {
+    console.log();
+  }
+
+  //4)Private methods(not yet implemented)
+  //#approveLoan(val) {
+  //  return true;
+  //}
+}
+
+const acc1 = new Account('Jonas', 'EUR', 1111);
+console.log(acc1);
+
+acc1.deposit(250);
+acc1.withdraw(140);
+acc1.requestLoan(1000);
+//acc1._approveLoan(1000); //still accessable, but convention recognized
+console.log(acc1);
+
+//Private: Error: Private field '#movements' must be declared in an enclosing class
+//console.log(acc1.#movements);
+console.log(acc1.getMovements()); //access through this method
+//console.log(acc1.#pin);
+//console.log(acc1.#approveLoan(100));//googlechrome sees it as a private field
+//not yet implemented
+
+//Static
+Account.helper();
+
+
+//////////////////////////////////////////////////////////////////////////
+//CHAINING METHODS
+//return the object itself at the end of a method that we want to be chainable
+
+class Account {
+  //1)Public fields
+  locale = navigator.language;
+
+  //2)Private fields
+  #movements = [];
+  #pin; //create undefined first
+
+  constructor(owner, currency, pin) {
+    this.owner = owner;
+    this.currency = currency;
+    this.#pin = pin;
+
+    console.log(`Thanks for opening an account, ${owner}!`);
+  }
+
+  //3)Public methods
+  // Public interface
+  getMovements() {
+    return this.#movements;
+  }
+
+  deposit(val) {
+    this.#movements.push(val);
+    return this; //makes method chainable
+  }
+
+  withdraw(val) {
+    this.deposit(-val);
+    return this; //makes method chainable
+  }
+
+  //Protected method
+  _approveLoan(val) {
+    return true;
+  }
+
+  requestLoan(val) {
+    if (this._approveLoan(val)) {
+      this.deposit(val);
+      console.log(`Loan for ${val} approved.`);
+      return this; //makes method chainable
+    }
+  }
+
+  //quick example of static:
+  static helper() {
+    console.log();
+  }
+}
+
+const acc1 = new Account('Jonas', 'EUR', 1111);
+console.log(acc1);
+
+acc1.deposit(250);
+acc1.withdraw(140);
+acc1.requestLoan(1000);
+console.log(acc1);
+
+console.log(acc1.getMovements());
+console.log(acc1);
+Account.helper();
+
+//CHAINING
+acc1.deposit(300).deposit(500).withdraw(35).requestLoan(25000).withdraw(4000);
+console.log(acc1.getMovements());
+*/
+
+//////////////////////////////////////////////////////////////////////////
+//CODING CHALLENGE #4
+
+/* 
+1. Re-create challenge #3, but this time using ES6 classes: create an 'EVCl' child class of the 'CarCl' class
+2. Make the 'charge' property private;
+3. Implement the ability to chain the 'accelerate' and 'chargeBattery' methods of this class, and also update the 'brake' method in the 'CarCl' class. They experiment with chaining!
+
+DATA CAR 1: 'Rivian' going at 120 km/h, with a charge of 23%
+
+GOOD LUCK!!!
+*/
+
+class CarCl {
+  constructor(make, speed) {
+    this.make = make;
+    this.speed = speed;
+  }
+
+  accelerate() {
+    this.speed += 10;
+    console.log(`${this.make} is going at ${this.speed} km/h`);
+  }
+
+  brake() {
+    this.speed -= 5;
+    console.log(`${this.make} is going at ${this.speed} km/h`);
+    return this;
+  }
+
+  get speedUS() {
+    return this.speed / 1.6;
+  }
+
+  set speedUS(speed) {
+    this.speed = speed * 1.6;
+  }
+}
+
+class EVCl extends CarCl {
+  #charge;
+
+  constructor(make, speed, charge) {
+    super(make, speed);
+    this.#charge = charge;
+  }
+
+  chargeBattery(chargeTo) {
+    this.#charge = chargeTo;
+    return this;
+  }
+
+  accelerate() {
+    this.speed += 20;
+    this.#charge--;
+    console.log(
+      `${this.make} is going at ${this.speed} km/h, with a charge of ${
+        this.#charge
+      }`
+    );
+    return this;
+  }
+}
+
+const rivian = new EVCl('Rivian', 120, 23);
+console.log(rivian);
+// console.log(rivian.#charge);//error, not accessable (encapsulated/private)
+rivian
+  .accelerate()
+  .accelerate()
+  .brake()
+  .accelerate()
+  .brake()
+  .chargeBattery(50)
+  .accelerate()
+  .brake()
+  .chargeBattery(80)
+  .accelerate();
+
+console.log(rivian.speedUS);
