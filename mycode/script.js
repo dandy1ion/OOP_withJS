@@ -516,7 +516,7 @@ console.log(tesla);
 tesla.brake();
 tesla.accelerate(); //EV accelerate called(first one in chain) POLYMORPHISM
 //child class can overwrite a method that it inherited from the parent class
-*/
+
 
 //////////////////////////////////////////////////////////////////////////
 //INHERITANCE BETWEEN 'CLASSES': ES6 CLASSES
@@ -566,4 +566,117 @@ class StudentCl extends PersonCl {
     super(fullName, birthYear); //pass in arguments from Parents Constructor
     this.course = course;
   }
+
+  introduce() {
+    console.log(`My name is ${this.fullName} and I study ${this.course}`);
+  }
+
+  //over-write a method (will come first in the prototype chain)
+  calcAge() {
+    console.log(
+      `I'm ${
+        2037 - this.birthYear
+      } years old, but as a student I feel more like ${
+        2037 - this.birthYear + 10
+      }.`
+    );
+  }
 }
+
+//class StudentCl extends PersonCl {}
+//super will automatically run without constructor method
+//const martha = new StudentCl('Martha Jones', 2012);
+
+const martha = new StudentCl('Martha Jones', 2012, 'Computer Science');
+martha.introduce();
+martha.calcAge();//new calcAge method will show
+
+
+//////////////////////////////////////////////////////////////////////////
+//INHERITANCE BETWEEN 'CLASSES': OBJECT.CREATE
+
+const PersonProto = {
+  calcAge() {
+    console.log(2037 - this.birthYear);
+  },
+
+  init(firstName, birthYear) {
+    this.firstName = firstName;
+    this.birthYear = birthYear;
+  },
+};
+
+const steven = Object.create(PersonProto);
+
+const StudentProto = Object.create(PersonProto);
+//add method (init) to StudentProto
+StudentProto.init = function (firstName, birthYear, course) {
+  //set 'this' keyword
+  PersonProto.init.call(this, firstName, birthYear);
+  this.course = course; //set new parameter
+};
+//add method (introduce)
+StudentProto.introduce = function () {
+  console.log(`My name is ${this.firstName} and I study ${this.course}.`);
+};
+
+//StudentProto is the parent of StudentProto jay
+//Object jay proto: StudentProto, Protoype StudentProto proto: PersonProto,
+//Prototype PersonProto holds the calcAge function
+const jay = Object.create(StudentProto);
+jay.init('Jay', 2010, 'Computer Science');
+jay.introduce();
+jay.calcAge();
+*/
+
+//////////////////////////////////////////////////////////////////////////
+//ANOTHER CLASS EXAMPLE
+
+class Account {
+  constructor(owner, currency, pin) {
+    this.owner = owner;
+    this.currency = currency;
+    this.pin = pin;
+    this.movements = [];
+    this.locale = navigator.language;
+
+    console.log(`Thanks for opening an account, ${owner}!`);
+  }
+
+  // Public interface
+  deposit(val) {
+    this.movements.push(val);
+  }
+
+  withdraw(val) {
+    this.deposit(-val);
+  }
+
+  approveLoan(val) {
+    return true;
+  }
+
+  requestLoan(val) {
+    if (this.approveLoan(val)) {
+      this.deposit(val);
+      console.log(`Loan ${val} approved.`);
+    }
+  }
+}
+
+const acc1 = new Account('Jonas', 'EUR', 1111);
+console.log(acc1);
+
+//not the best to directly interact with the properties
+//acc1.movements.push(250);
+//acc1.movements.push(-140);
+//better to create methods that interact with properties
+acc1.deposit(250);
+acc1.withdraw(140);
+acc1.requestLoan(1000);
+acc1.approveLoan(1000); //doesn't do anything but shouldn't be able to access this method
+console.log(acc1);
+
+//pin accessable outside account (security issue)
+console.log(acc1.pin);
+//need data encapsilation and data privacy
